@@ -42,7 +42,8 @@ android {
         create("release") {
             val storeFilePath = keystoreProperties.getProperty("storeFile")
             if (storeFilePath != null) {
-                storeFile = file(storeFilePath)
+                // Resolve relative to android/ (rootProject), not android/app/
+                storeFile = rootProject.file(storeFilePath)
             }
             storePassword = keystoreProperties.getProperty("storePassword")
             keyAlias = keystoreProperties.getProperty("keyAlias")
@@ -50,11 +51,20 @@ android {
         }
     }
 
+    val resolvedKeystoreFile =
+        runCatching {
+            val p = keystoreProperties.getProperty("storeFile") ?: return@runCatching null
+            rootProject.file(p)
+        }.getOrNull()
+
     buildTypes {
         release {
-            // If key.properties is missing, fall back to debug signing
+            // If key.properties is missing OR keystore file not found, fall back to debug signing
             signingConfig =
-                if (keystorePropertiesFile.exists()) {
+                if (keystorePropertiesFile.exists() &&
+                    resolvedKeystoreFile != null &&
+                    resolvedKeystoreFile.exists()
+                ) {
                     signingConfigs.getByName("release")
                 } else {
                     signingConfigs.getByName("debug")

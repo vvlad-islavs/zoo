@@ -55,7 +55,6 @@ dev_dependencies:
   auto_route_generator: ^10.5.0
   objectbox_generator: ^5.3.1
   flutter_launcher_icons: ^0.14.4
-  image: ^4.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
